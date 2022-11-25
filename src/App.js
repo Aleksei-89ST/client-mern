@@ -9,6 +9,8 @@ import {
   PostsPage,
   RegisterPage,
 } from "./pages";
+import {ToastContainer} from "react-toastify"
+import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
   return (
@@ -22,6 +24,7 @@ function App() {
         <Route path="register" element={<RegisterPage />} />
         <Route path="/new" element={<AddPostPage />} />
       </Routes>
+      <ToastContainer position="bottom-right"/>
     </Layout>
   );
 }
