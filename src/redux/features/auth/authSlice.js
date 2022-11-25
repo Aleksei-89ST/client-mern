@@ -42,11 +42,27 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
+export const getMe = createAsyncThunk("auth/loginUser", async () => {
+  try {
+    const { data } = await axios.get("/auth/me");
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 export const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  // функции меняющие стейт
+  reducers: {
+    logout: (state) => {
+      state.user = null;
+      state.token = null;
+      state.status = null;
+      state.isLoading = false;
+    },
+  },
   // это обьект где управлять состоянием
   extraReducers: {
     // Register user
@@ -79,7 +95,24 @@ export const authSlice = createSlice({
       state.isLoading = false;
       state.status = action.payload.message;
     },
+    // Проверка авторизации
+    [getMe.pending]: (state) => {
+      state.isLoading = true;
+      state.status = null;
+    },
+    [getMe.fulfilled]: (state, action) => {
+      state.isLoading = false;
+      state.status = null;
+      state.user = action.payload?.user;
+      state.token = action.payload?.token;
+    },
+    [getMe.rejected]: (state, action) => {
+      state.isLoading = false;
+      state.status = action.payload.message;
+    },
   },
 });
+export const checkIsAuth = (state) => Boolean(state.auth.token);
 
+export const { logout } = authSlice.actions;
 export default authSlice.reducer;

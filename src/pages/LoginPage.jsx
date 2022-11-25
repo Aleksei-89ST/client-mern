@@ -2,17 +2,20 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { loginUser } from "../redux/features/auth/authSlice";
+import { checkIsAuth, loginUser } from "../redux/features/auth/authSlice";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-  const {status} = useSelector((state) => state.auth);
-  const navigate = useNavigate()
+  const { status } = useSelector((state) => state.auth);
+  const isAuth = useSelector(checkIsAuth);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if(status) toast(status)},[status]);
+    if (status) toast(status);
+    if (isAuth) navigate("/");
+  }, [status, isAuth, navigate]);
 
   const handleClick = () => {
     dispatch(loginUser({ username, password }));
