@@ -11,10 +11,7 @@ const RegisterPage = () => {
   const { status } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (status) {
-      toast(status);
-    }
-  }, [status]);
+    if (status) toast(status)},[status]);
 
   const handleSubmit = () => {
     try {
