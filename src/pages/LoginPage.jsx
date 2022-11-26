@@ -9,6 +9,8 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const { status } = useSelector((state) => state.auth);
+
+  // проверяю в системе нахожусь или нет 
   const isAuth = useSelector(checkIsAuth);
   const navigate = useNavigate();
 

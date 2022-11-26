@@ -31,7 +31,7 @@ function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path=":id/edit" element={<EditPostPage />} />
         <Route path="register" element={<RegisterPage />} />
-        <Route path="/new" element={<AddPostPage />} />
+        <Route path="new" element={<AddPostPage />} />
       </Routes>
       <ToastContainer position="bottom-right"/>
     </Layout>

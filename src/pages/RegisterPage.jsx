@@ -1,17 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { registerUser } from "../redux/features/auth/authSlice";
+import { checkIsAuth, registerUser } from "../redux/features/auth/authSlice";
 
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const { status } = useSelector((state) => state.auth);
+  // проверяет в системе нахожусь или нет
+  const isAuth = useSelector(checkIsAuth);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (status) toast(status)},[status]);
+    if (status) {
+      toast(status)
+    }
+    if (isAuth) navigate('/')
+  }, [status,isAuth,navigate]);
 
   const handleSubmit = () => {
     try {
