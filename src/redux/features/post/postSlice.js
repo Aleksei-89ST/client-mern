@@ -28,6 +28,15 @@ export const getAllPosts = createAsyncThunk("post/getAllPosts", async () => {
   }
 });
 
+export const removePost = createAsyncThunk("/post/removePost", async (id) => {
+  try {
+    const { data } = await axios.delete(`/posts/${id}`, id);
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 export const postSlice = createSlice({
   name: "post",
   initialState,
@@ -44,18 +53,31 @@ export const postSlice = createSlice({
     [createPost.rejected]: (state) => {
       state.loading = false;
     },
-     // получение всех постов
-     [getAllPosts.pending]: (state) => {
-        state.loading = true;
-      },
-      [getAllPosts.fulfilled]: (state, action) => {
-        state.loading = false;
-        state.posts = action.payload.posts;
-        state.popularPosts = action.payload.popularPosts;
-      },
-      [getAllPosts.rejected]: (state) => {
-        state.loading = false;
-      },
+    // получение всех постов
+    [getAllPosts.pending]: (state) => {
+      state.loading = true;
+    },
+    [getAllPosts.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.posts = action.payload.posts;
+      state.popularPosts = action.payload.popularPosts;
+    },
+    [getAllPosts.rejected]: (state) => {
+      state.loading = false;
+    },
+    // удаление поста
+    [removePost.pending]: (state) => {
+      state.loading = true;
+    },
+    [removePost.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.posts = state.posts.filter(
+        (post) => post._id !== action.payload_id
+      );
+    },
+    [removePost.rejected]: (state) => {
+      state.loading = false;
+    },
   },
 });
 
