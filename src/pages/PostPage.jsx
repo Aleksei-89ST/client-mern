@@ -9,28 +9,51 @@ import Moment from "react-moment";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { CommentItem } from "../components/CommentItem";
+import {
+  createComment,
+  getPostComments,
+} from "../redux/features/comment/commentSlice";
 import { removePost } from "../redux/features/post/postSlice";
 import axios from "../utils/axios";
 
 // Тут находятся один пост конкретного пользователя
 export const PostPage = () => {
-  const [post, setPost] = useState(null);
+  const [post, setPost] = useState("");
+  const [comment, setComment] = useState("");
   const navigate = useNavigate();
   // из строки браузера беру параметры
   const params = useParams();
   const { user } = useSelector((state) => state.auth);
+  const { comments } = useSelector((state) => state.comment);
   const dispatch = useDispatch();
 
-// удаление поста
+  // удаление поста
   const removePostHandler = () => {
-  try {
-    dispatch(removePost(params.id))
-    toast("Пост был удалён")
-    navigate('/posts')
-  } catch (error) {
-    console.log(error);
-  }
+    try {
+      dispatch(removePost(params.id));
+      toast("Пост был удалён");
+      navigate("/posts");
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  const handleSubmit = () => {
+    try {
+      const postId = params.id;
+      dispatch(createComment({ postId, comment }));
+      setComment("");
+    } catch (error) {}
+  };
+
+  const fetchComments = useCallback(async () => {
+    try {
+      dispatch(getPostComments(params.id));
+    } catch (error) {
+      console.log(error);
+    }
+  }, [params.id, dispatch]);
 
   const fetchPost = useCallback(async () => {
     const { data } = await axios.get(`/posts/${params.id}`);
@@ -40,6 +63,10 @@ export const PostPage = () => {
   useEffect(() => {
     fetchPost();
   }, [fetchPost]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
 
   if (!post) {
     return (
@@ -59,7 +86,7 @@ export const PostPage = () => {
           <div className="flex flex-col basis-1/4 flex-grow">
             <div
               className={
-                post?.imgUrl ? "flex rounded-sm h-80" : "flex rounded-sm"
+                post?.imgUrl ? "flex rounded-sm h-100" : "flex rounded-sm"
               }
             >
               {post?.imgUrl && (
@@ -92,7 +119,10 @@ export const PostPage = () => {
             {user?._id === post.author && (
               <div className="flex gap-3 mt-4">
                 <button className="flex items-center justify-center gap-2 text-white opacity-50">
-                 <Link to={`/${params.id}/edit`}> <AiTwotoneEdit /></Link>
+                  <Link to={`/${params.id}/edit`}>
+                    {" "}
+                    <AiTwotoneEdit />
+                  </Link>
                 </button>
                 <button
                   onClick={removePostHandler}
@@ -104,7 +134,27 @@ export const PostPage = () => {
             )}
           </div>
         </div>
-        <div className="w-1/3">COMMENTS</div>
+        <div className="w-1/3 p-8 bg-gray-700 flex flex-col gap-2 rounded-sm">
+          <form onSubmit={(e) => e.preventDefault()} className="flex gap-2">
+            <input
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              type="text"
+              placeholder="комментарии"
+              className="text-black w-full rounded-sm bg-gray-400 border p-2 text-xs outline-none placeholder:text-gray-700"
+            />
+            <button
+              type="submit"
+              onClick={handleSubmit}
+              className="flex justify-center items-center bg-gray-600 text-xs text-white rounded-sm py-2 px-4 "
+            >
+              Отправить
+            </button>
+          </form>
+          {comments?.map((cmt) => (
+            <CommentItem key={cmt._id} cmt={cmt} />
+          ))}
+        </div>
       </div>
     </div>
   );
